@@ -1,8 +1,8 @@
 const wallHeight = 64;
 const playerHeight = wallHeight / 32;
 const fieldOfView = 60;
-const playerX = 160;
-const playerY = 160;
+let playerX = 160;
+let playerY = 160;
 const planeWidth = 320;
 const planeHeight = 200;
 const angleBetweenRays = fieldOfView / planeWidth;
@@ -180,12 +180,7 @@ const drawScreen = (angle) => {
     let startingAngle = getRightAngle(viewingAngle - 30);
 
     for (let a = 0; a < 320; a ++) {
-        let horizontalIntersection;
-        try {
-            horizontalIntersection = findHorizontalIntersection(startingAngle);
-        } catch(e) {
-            console.error(viewingAngle + ' ' + startingAngle);
-        }
+        const horizontalIntersection = findHorizontalIntersection(startingAngle);
         const verticalIntersection = findVerticalIntersection(startingAngle);
 
         const horizontalDistance = findDistance(horizontalIntersection[0], horizontalIntersection[1]);
@@ -222,14 +217,18 @@ document.onkeydown = function(e) {
             drawScreen(currentAngle % 360);
             break;
         case 38:
-            alert('up');
+            playerX += Math.cos(degreesToRadians(currentAngle)) * 10;
+            playerY -= Math.sin(degreesToRadians(currentAngle)) * 10;
+            drawScreen(currentAngle % 360);
             break;
         case 39:
             currentAngle -= 5;
             drawScreen(currentAngle % 360);
             break;
         case 40:
-            alert('down');
+            playerX -= Math.cos(degreesToRadians(currentAngle)) * 10;
+            playerY += Math.sin(degreesToRadians(currentAngle)) * 10;
+            drawScreen(currentAngle % 360);
             break;
     }
 };
