@@ -18,7 +18,7 @@ const distanceToProjectionPlane = 277;
 
 const map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 1, 0, 0, 1, 0, 0, 1],
+    [1, 0, 1, 0, 0, 1, 0, 0, 2],
     [1, 0, 1, 1, 0, 1, 0, 1, 1],
     [1, 0, 0, 0, 0, 1, 0, 1, 1],
     [1, 0, 1, 1, 1, 1, 0, 1, 1],
@@ -30,7 +30,7 @@ const map = [
 
 const checkWallHit = (x, y) => {
     if ((x >= map.length) || (y >= map[0].length) || (x < 0) || (y < 0)) return true;
-    return map[y][x];
+    return map[y][x] > 0;
 }
 
 const findHorizontalIntersection = (angle) => {
@@ -154,7 +154,16 @@ const drawScreen = () => {
 
         const projetedWallSlice = wallSize / correctedDistance * distanceToProjectionPlane;
 
-        screenRenderer.drawWall(wallSlice, projetedWallSlice, Math.floor(correctedDistance));
+        const closestIntersectionGridX = Math.floor(closestIntersection[0] / wallSize);
+        const closestIntersectionGridY = Math.floor(closestIntersection[1] / wallSize);
+
+        const isSpecialWall = map[closestIntersectionGridY][closestIntersectionGridX] === 2;
+
+        const isVertical = horizontalDistance > verticalDistance;
+
+        const offset = isVertical ? closestIntersection[1] % wallSize : closestIntersection[0] % wallSize;
+
+        screenRenderer.drawWall(wallSlice, projetedWallSlice, Math.floor(correctedDistance), isSpecialWall, Math.floor(offset));
         mapRenderer.drawRay(playerX, playerY, closestIntersection);
         mapRenderer.drawPlayer(playerX, playerY);
 

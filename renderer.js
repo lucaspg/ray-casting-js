@@ -29,12 +29,22 @@ export default class Renderer {
         }
     }
 
-    drawWall (column, wallHeight, dist) {
-        this.context.fillStyle = shadeColor('#FFFFFF', dist / 448 * -100); 
-        this.context.beginPath();
-        this.context.rect(column, (this.canvas.height / 2) - wallHeight / 2, 1, wallHeight);
-        this.context.closePath();
-        this.context.fill();
+    drawWall (column, wallHeight, dist, isSpecialWall, offset) {
+        if (!isSpecialWall) {
+            this.context.beginPath();
+            this.context.fillStyle = shadeColor('#FFFFFF', dist / 448 * -100); 
+            this.context.fillRect(column, (this.canvas.height / 2) - wallHeight / 2, 1, wallHeight);
+            this.context.fill();
+            this.context.closePath();
+        } else {
+            this.context.beginPath();
+            const img = document.getElementById("einstein");
+            this.context.drawImage(img, offset, 0, 1, 64, column, (this.canvas.height / 2) - wallHeight / 2, 1, wallHeight)
+            const alpha = (dist / 448) < 0.8 ? (dist/ 448) : 0.8;
+            this.context.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+            this.context.fillRect(column, (this.canvas.height / 2) - wallHeight / 2, 1, wallHeight);
+            this.context.closePath();
+        }
     }
 
     drawLine(startX, startY, endX, endY, cssColor) {
