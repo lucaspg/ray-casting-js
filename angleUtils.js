@@ -33,5 +33,6 @@ export const getPositiveAngle = (angle) => {
 }
 
 export const findDistance = (a, b, x, y) => {
+    if (!x || !y) return Number.POSITIVE_INFINITY;
     return Math.sqrt(Math.pow(a - x, 2) + Math.pow(b - y, 2));
 }

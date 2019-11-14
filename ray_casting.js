@@ -198,23 +198,23 @@ const updatePlayerPosition = (keyCode) => {
 
     switch (keyCode) {
         case 87: {
-            xDisplacement = Math.cos(degreesToRadians(currentAngle)) * 5;
-            yDisplacement = Math.sin(degreesToRadians(currentAngle)) * -5;
+            xDisplacement = Math.cos(degreesToRadians(currentAngle)) * 2;
+            yDisplacement = Math.sin(degreesToRadians(currentAngle)) * -2;
             break;
         }
         case 83: {
-            xDisplacement = Math.cos(degreesToRadians(currentAngle)) * -5;
-            yDisplacement = Math.sin(degreesToRadians(currentAngle)) * 5;
+            xDisplacement = Math.cos(degreesToRadians(currentAngle)) * -2;
+            yDisplacement = Math.sin(degreesToRadians(currentAngle)) * 2;
             break;
         }
         case 65: {
-            xDisplacement = Math.cos(degreesToRadians(currentAngle - 90)) * -5;
-            yDisplacement = Math.sin(degreesToRadians(currentAngle - 90)) * 5;
+            xDisplacement = Math.cos(degreesToRadians(currentAngle - 90)) * -2;
+            yDisplacement = Math.sin(degreesToRadians(currentAngle - 90)) * 2;
             break;
         }
         case 68: {
-            xDisplacement = Math.cos(degreesToRadians(currentAngle - 90)) * 5;
-            yDisplacement = Math.sin(degreesToRadians(currentAngle - 90)) * -5;
+            xDisplacement = Math.cos(degreesToRadians(currentAngle - 90)) * 2;
+            yDisplacement = Math.sin(degreesToRadians(currentAngle - 90)) * -2;
             break;
         }
         default: {
@@ -255,7 +255,7 @@ const updatePlayerPosition = (keyCode) => {
 };
 
 const updateCamera = (e) => {
-    const turn = e.movementX;
+    const turn = e.movementX / 2;
     currentAngle -= turn;
 }
 
