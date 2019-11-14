@@ -15,6 +15,7 @@ const fieldOfView = 60;
 let playerX = 96;
 let playerY = 96;
 const distanceToProjectionPlane = 277;
+let currentKeyPressed = 0;
 
 const map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -126,6 +127,8 @@ const findVerticalIntersection = (angle) => {
 }
 
 const drawScreen = () => {
+    updatePlayerPosition(currentKeyPressed);
+
     const roundedAngle = currentAngle % 360;
 
     const mapRenderer = new Renderer(mapCanvas);
@@ -182,10 +185,18 @@ let mapCanvas = document.getElementById("mapCanvas");
 let screenCanvas = document.getElementById("screenCanvas");
 
 document.onkeydown = function(e) {
+    currentKeyPressed = e.keyCode;
+};
+
+document.onkeyup = function(e) {
+    currentKeyPressed = 0;
+};
+
+const updatePlayerPosition = (keyCode) => {
     let xDisplacement;
     let yDisplacement;
 
-    switch (e.keyCode) {
+    switch (keyCode) {
         case 87: {
             xDisplacement = Math.cos(degreesToRadians(currentAngle)) * 5;
             yDisplacement = Math.sin(degreesToRadians(currentAngle)) * -5;
