@@ -38,7 +38,7 @@ export default class Renderer {
             this.context.closePath();
         } else {
             this.context.beginPath();
-            const img = document.getElementById("einstein");
+            const img = document.getElementById("easteregg");
             this.context.drawImage(img, offset, 0, 1, 64, column, (this.canvas.height / 2) - wallHeight / 2, 1, wallHeight)
             const alpha = (dist / 448) < 0.8 ? (dist/ 448) : 0.8;
             this.context.fillStyle = `rgba(0, 0, 0, ${alpha})`;
