@@ -248,5 +248,7 @@ const updateCamera = (e) => {
     currentAngle -= turn;
 }
 
-loadCamera(screenCanvas, updateCamera);
-window.requestAnimationFrame(drawScreen);
+window.onload = function() {
+    loadCamera(screenCanvas, updateCamera);
+    window.requestAnimationFrame(drawScreen);
+}
