@@ -15,7 +15,7 @@ const fieldOfView = 60;
 let playerX = 96;
 let playerY = 96;
 const distanceToProjectionPlane = 277;
-let currentKeyPressed = 0;
+let keysPressed = {};
 
 const map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -127,7 +127,7 @@ const findVerticalIntersection = (angle) => {
 }
 
 const drawScreen = () => {
-    updatePlayerPosition(currentKeyPressed);
+    updatePlayerPosition();
 
     const roundedAngle = currentAngle % 360;
 
@@ -185,41 +185,39 @@ let mapCanvas = document.getElementById("mapCanvas");
 let screenCanvas = document.getElementById("screenCanvas");
 
 document.onkeydown = function(e) {
-    currentKeyPressed = e.keyCode;
+    keysPressed[e.keyCode] = true;
 };
 
 document.onkeyup = function(e) {
-    currentKeyPressed = 0;
+    keysPressed[e.keyCode] = false;
 };
 
-const updatePlayerPosition = (keyCode) => {
-    let xDisplacement;
-    let yDisplacement;
+const updatePlayerPosition = () => {
+    let xDisplacement = 0;
+    let yDisplacement = 0;
 
-    switch (keyCode) {
-        case 87: {
-            xDisplacement = Math.cos(degreesToRadians(currentAngle)) * 2;
-            yDisplacement = Math.sin(degreesToRadians(currentAngle)) * -2;
-            break;
-        }
-        case 83: {
-            xDisplacement = Math.cos(degreesToRadians(currentAngle)) * -2;
-            yDisplacement = Math.sin(degreesToRadians(currentAngle)) * 2;
-            break;
-        }
-        case 65: {
-            xDisplacement = Math.cos(degreesToRadians(currentAngle - 90)) * -2;
-            yDisplacement = Math.sin(degreesToRadians(currentAngle - 90)) * 2;
-            break;
-        }
-        case 68: {
-            xDisplacement = Math.cos(degreesToRadians(currentAngle - 90)) * 2;
-            yDisplacement = Math.sin(degreesToRadians(currentAngle - 90)) * -2;
-            break;
-        }
-        default: {
-            return;
-        }
+    if (!keysPressed[87] && !keysPressed[83] && !keysPressed[65] && !keysPressed[68]) {
+        return;
+    }
+
+    if (keysPressed[87]) {
+        xDisplacement += Math.cos(degreesToRadians(currentAngle)) * 2;
+        yDisplacement += Math.sin(degreesToRadians(currentAngle)) * -2;
+    }
+
+    if (keysPressed[83]) {
+        xDisplacement += Math.cos(degreesToRadians(currentAngle)) * -2;
+        yDisplacement += Math.sin(degreesToRadians(currentAngle)) * 2;
+    }
+
+    if (keysPressed[65]) {
+        xDisplacement += Math.cos(degreesToRadians(currentAngle - 90)) * -2;
+        yDisplacement += Math.sin(degreesToRadians(currentAngle - 90)) * 2;
+    }
+
+    if (keysPressed[68]) {
+        xDisplacement += Math.cos(degreesToRadians(currentAngle - 90)) * 2;
+        yDisplacement += Math.sin(degreesToRadians(currentAngle - 90)) * -2;
     }
 
     playerX += xDisplacement;
