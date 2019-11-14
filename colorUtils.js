@@ -1,6 +1,6 @@
 export const shadeColor = (color, percent) => {
     if (percent < -80) {
-        percent = -80
+        percent = -80;
     }
 
     let r = parseInt(color.substring(1, 3), 16);
