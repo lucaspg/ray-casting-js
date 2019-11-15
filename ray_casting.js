@@ -9,27 +9,30 @@ import {
     isRayFacingRight,
 } from './angleUtils.js';
 import { loadCamera } from "./camera.js";
+import { getPlayerPos } from "./movement.js";
 
-const wallSize = 64;
-const fieldOfView = 60;
 let playerX = 96;
 let playerY = 96;
-const distanceToProjectionPlane = 277;
 let keysPressed = {};
-
+let currentAngle = 0;
+let mapCanvas = document.getElementById("mapCanvas");
+let screenCanvas = document.getElementById("screenCanvas");
+const wallSize = 64;
+const fieldOfView = 60;
+const distanceToProjectionPlane = 277;
 const map = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 1, 0, 0, 1, 0, 0, 2],
-    [1, 0, 1, 1, 0, 1, 0, 1, 1],
-    [1, 0, 0, 0, 0, 1, 0, 1, 1],
-    [1, 0, 1, 1, 1, 1, 0, 1, 1],
-    [1, 0, 1, 1, 1, 0, 0, 0, 1],
-    [1, 0, 0, 0, 1, 1, 1, 0, 1],
-    [1, 1, 1, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [2, 2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 0, 2, 0, 0, 2, 0, 0, 2],
+    [2, 0, 2, 2, 0, 2, 0, 2, 2],
+    [2, 0, 0, 0, 0, 2, 0, 2, 2],
+    [2, 0, 2, 2, 2, 2, 0, 2, 2],
+    [2, 0, 2, 2, 2, 0, 0, 0, 2],
+    [2, 0, 0, 0, 2, 2, 2, 0, 2],
+    [2, 2, 2, 0, 0, 0, 0, 0, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2, 2],
 ];
 
-const checkWallHit = (x, y) => {
+export const checkWallHit = (x, y) => {
     if ((x >= map.length) || (y >= map[0].length) || (x < 0) || (y < 0)) return true;
     return map[y][x] > 0;
 }
@@ -127,7 +130,11 @@ const findVerticalIntersection = (angle) => {
 }
 
 const drawScreen = () => {
-    updatePlayerPosition();
+    const playerPos = getPlayerPos(keysPressed, playerX, playerY, currentAngle);
+    if (playerPos) {
+        playerX = playerPos[0];
+        playerY = playerPos[1];
+    }
 
     const roundedAngle = currentAngle % 360;
 
@@ -160,13 +167,13 @@ const drawScreen = () => {
         const closestIntersectionGridX = Math.floor(closestIntersection[0] / wallSize);
         const closestIntersectionGridY = Math.floor(closestIntersection[1] / wallSize);
 
-        const isSpecialWall = map[closestIntersectionGridY][closestIntersectionGridX] === 2;
+        const wallType = map[closestIntersectionGridY][closestIntersectionGridX];
 
         const isVertical = horizontalDistance > verticalDistance;
 
         const offset = isVertical ? closestIntersection[1] % wallSize : closestIntersection[0] % wallSize;
 
-        screenRenderer.drawWall(wallSlice, projetedWallSlice, Math.floor(correctedDistance), isSpecialWall, Math.floor(offset));
+        screenRenderer.drawWall(wallSlice, projetedWallSlice, Math.floor(correctedDistance), wallType, Math.floor(offset));
         mapRenderer.drawRay(playerX, playerY, closestIntersection);
         mapRenderer.drawPlayer(playerX, playerY);
 
@@ -178,11 +185,10 @@ const drawScreen = () => {
     window.requestAnimationFrame(drawScreen);
 }
 
-let currentAngle = 0;
-
-let mapCanvas = document.getElementById("mapCanvas");
-
-let screenCanvas = document.getElementById("screenCanvas");
+const updateCamera = (e) => {
+    const turn = e.movementX / 2;
+    currentAngle -= turn;
+}
 
 document.onkeydown = function(e) {
     keysPressed[e.keyCode] = true;
@@ -191,71 +197,6 @@ document.onkeydown = function(e) {
 document.onkeyup = function(e) {
     keysPressed[e.keyCode] = false;
 };
-
-const updatePlayerPosition = () => {
-    let xDisplacement = 0;
-    let yDisplacement = 0;
-
-    if (!keysPressed[87] && !keysPressed[83] && !keysPressed[65] && !keysPressed[68]) {
-        return;
-    }
-
-    if (keysPressed[87]) {
-        xDisplacement += Math.cos(degreesToRadians(currentAngle)) * 2;
-        yDisplacement += Math.sin(degreesToRadians(currentAngle)) * -2;
-    }
-
-    if (keysPressed[83]) {
-        xDisplacement += Math.cos(degreesToRadians(currentAngle)) * -2;
-        yDisplacement += Math.sin(degreesToRadians(currentAngle)) * 2;
-    }
-
-    if (keysPressed[65]) {
-        xDisplacement += Math.cos(degreesToRadians(currentAngle - 90)) * -2;
-        yDisplacement += Math.sin(degreesToRadians(currentAngle - 90)) * 2;
-    }
-
-    if (keysPressed[68]) {
-        xDisplacement += Math.cos(degreesToRadians(currentAngle - 90)) * 2;
-        yDisplacement += Math.sin(degreesToRadians(currentAngle - 90)) * -2;
-    }
-
-    playerX += xDisplacement;
-    playerY += yDisplacement;
-
-    const playerXGrid = Math.floor(playerX / wallSize);
-    const playerYGrid = Math.floor(playerY / wallSize);
-
-    const playerXGridOffset = playerX % wallSize;
-    const playerYGridOffset = playerY % wallSize;
-
-    const minDistanceToWall = 15;
-
-    if (xDisplacement > 0) {
-        if (checkWallHit(playerXGrid + 1, playerYGrid) && (playerXGridOffset > (wallSize - minDistanceToWall))) {
-            playerX -= playerXGridOffset - (wallSize - minDistanceToWall);
-        }
-    } else {
-        if (checkWallHit(playerXGrid - 1, playerYGrid) && (playerXGridOffset < (minDistanceToWall))) {
-            playerX += minDistanceToWall - playerXGridOffset;
-        }
-    }
-
-    if (yDisplacement < 0) {
-        if (checkWallHit(playerXGrid, playerYGrid - 1) && (playerYGridOffset < (minDistanceToWall))) {
-            playerY += minDistanceToWall - playerYGridOffset;
-        }
-    } else {
-        if (checkWallHit(playerXGrid, playerYGrid + 1) && (playerYGridOffset > (wallSize - minDistanceToWall))) {
-            playerY -= playerYGridOffset - (wallSize - minDistanceToWall);
-        }
-    }
-};
-
-const updateCamera = (e) => {
-    const turn = e.movementX / 2;
-    currentAngle -= turn;
-}
 
 window.onload = function() {
     loadCamera(screenCanvas, updateCamera);

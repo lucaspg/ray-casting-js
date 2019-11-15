@@ -8,6 +8,14 @@ export default class Renderer {
         this.context = canvas.getContext("2d");
     }
 
+    getTextureIdByWallType(wallType) {
+        const textureMap = {
+            2: "redbrick"
+        };
+
+        return textureMap[wallType];
+    }
+
     drawGrid(map) {
         const rows = map.length;
         const columns = map[0].length;
@@ -29,8 +37,8 @@ export default class Renderer {
         }
     }
 
-    drawWall (column, wallHeight, dist, isSpecialWall, offset) {
-        if (!isSpecialWall) {
+    drawWall (column, wallHeight, dist, wallType, offset) {
+        if (wallType === 1) {
             this.context.beginPath();
             this.context.fillStyle = shadeColor('#FFFFFF', dist / 448 * -100); 
             this.context.fillRect(column, (this.canvas.height / 2) - wallHeight / 2, 1, wallHeight);
@@ -38,7 +46,8 @@ export default class Renderer {
             this.context.closePath();
         } else {
             this.context.beginPath();
-            const img = document.getElementById("easteregg");
+            const textureId = this.getTextureIdByWallType(wallType)
+            const img = document.getElementById(textureId);
             this.context.drawImage(img, offset, 0, 1, 64, column, (this.canvas.height / 2) - wallHeight / 2, 1, wallHeight)
             const alpha = (dist / 448) < 0.8 ? (dist/ 448) : 0.8;
             this.context.fillStyle = `rgba(0, 0, 0, ${alpha})`;
