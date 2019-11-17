@@ -14,21 +14,21 @@ import { getPlayerPos } from "./movement.js";
 let playerX = 96;
 let playerY = 96;
 let keysPressed = {};
-let currentAngle = 0;
+let currentAngle = 300;
 let mapCanvas = document.getElementById("mapCanvas");
 let screenCanvas = document.getElementById("screenCanvas");
 const wallSize = 64;
 const fieldOfView = 60;
 const distanceToProjectionPlane = 277;
-const map = [
+export const map = [
     [2, 2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 0, 2, 0, 0, 2, 0, 0, 2],
-    [2, 0, 2, 2, 0, 2, 0, 2, 2],
-    [2, 0, 0, 0, 0, 2, 0, 2, 2],
-    [2, 0, 2, 2, 2, 2, 0, 2, 2],
-    [2, 0, 2, 2, 2, 0, 0, 0, 2],
-    [2, 0, 0, 0, 2, 2, 2, 0, 2],
-    [2, 2, 2, 0, 0, 0, 0, 0, 2],
+    [2, 0, 2, 2, 0, 0, 0, 0, 2],
+    [2, 0, 2, 2, 0, 2, 2, 0, 2],
+    [2, 0, 0, 0, 0, 2, 0, 0, 2],
+    [2, 2, 2, 2, 2, 2, 0, 2, 2],
+    [2, 0, 0, 0, 0, 2, 0, 0, 2],
+    [2, 0, 2, 0, 2, 2, 2, 0, 2],
+    [2, 0, 0, 0, 0, 0, 0, 0, 2],
     [2, 2, 2, 2, 2, 2, 2, 2, 2],
 ];
 
@@ -173,7 +173,9 @@ const drawScreen = () => {
 
         const offset = isVertical ? closestIntersection[1] % wallSize : closestIntersection[0] % wallSize;
 
-        screenRenderer.drawWall(wallSlice, projetedWallSlice, Math.floor(correctedDistance), wallType, Math.floor(offset));
+        const relativeAngle = degreesToRadians(viewingAngle - startingAngle);
+
+        screenRenderer.drawWall(wallSlice, projetedWallSlice, Math.floor(correctedDistance), wallType, Math.floor(offset), relativeAngle, playerX, playerY, degreesToRadians(startingAngle));
         mapRenderer.drawRay(playerX, playerY, closestIntersection);
         mapRenderer.drawPlayer(playerX, playerY);
 

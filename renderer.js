@@ -1,6 +1,12 @@
 import { shadeColor, rgbToHexColor } from './colorUtils.js';
 
+import { map } from './ray_casting.js';
+
 const WALL_WIDTH = 64;
+
+const PLAYER_HEIGHT = 32;
+
+const distanceToProjectionPlane = 277;
 
 export default class Renderer {
     constructor(canvas) {
@@ -37,7 +43,7 @@ export default class Renderer {
         }
     }
 
-    drawWall (column, wallHeight, dist, wallType, offset) {
+    drawWall (column, wallHeight, dist, wallType, offset, relativeAngle, playerX, playerY, startingAngle) {
         if (wallType === 1) {
             this.context.beginPath();
             this.context.fillStyle = shadeColor('#FFFFFF', dist / 448 * -100); 
@@ -54,6 +60,21 @@ export default class Renderer {
             this.context.fillRect(column, (this.canvas.height / 2) - wallHeight / 2, 1, wallHeight);
             this.context.closePath();
         }
+        let bottomWallPixel = (this.canvas.height / 2) + (Math.floor(wallHeight / 2));
+        this.context.beginPath();
+        for (bottomWallPixel; bottomWallPixel < this.canvas.height; bottomWallPixel++) {
+            const straightDistance = (PLAYER_HEIGHT / (bottomWallPixel - (this.canvas.height / 2))) * distanceToProjectionPlane;
+            const actualDistance = straightDistance / Math.cos(relativeAngle);
+            let floorY = Math.floor(actualDistance * Math.sin(startingAngle));
+            let floorX = Math.floor(actualDistance * Math.cos(startingAngle));
+            floorX = playerX + floorX;
+            floorY = playerY - floorY;
+            const tileRow = Math.floor(floorY % 64);
+            const tileColumn = Math.floor(floorX % 64);
+            const floor = document.getElementById("floor");
+            this.context.drawImage(floor, tileRow, tileColumn, 1, 1, column, bottomWallPixel, 1, 1)
+        }
+        this.context.closePath();
     }
 
     drawLine(startX, startY, endX, endY, cssColor) {
