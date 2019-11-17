@@ -20,6 +20,8 @@ let screenCanvas = document.getElementById("screenCanvas");
 const wallSize = 64;
 const fieldOfView = 60;
 const distanceToProjectionPlane = 277;
+let projectionPlaneCenter = 100;
+let playerHeight = 32;
 export const map = [
     [2, 2, 2, 2, 2, 2, 2, 2, 2],
     [2, 0, 2, 2, 0, 0, 0, 0, 2],
@@ -175,7 +177,18 @@ const drawScreen = () => {
 
         const relativeAngle = degreesToRadians(viewingAngle - startingAngle);
 
-        screenRenderer.drawWall(wallSlice, projetedWallSlice, Math.floor(correctedDistance), wallType, Math.floor(offset), relativeAngle, playerX, playerY, degreesToRadians(startingAngle));
+        screenRenderer.drawWall(
+            wallSlice,
+            projetedWallSlice,
+            Math.floor(correctedDistance),
+            wallType,
+            Math.floor(offset),
+            relativeAngle,
+            playerX,
+            playerY,
+            degreesToRadians(startingAngle),
+            projectionPlaneCenter,
+            playerHeight);
         mapRenderer.drawRay(playerX, playerY, closestIntersection);
         mapRenderer.drawPlayer(playerX, playerY);
 
@@ -188,16 +201,26 @@ const drawScreen = () => {
 }
 
 const updateCamera = (e) => {
-    const turn = e.movementX / 2;
-    currentAngle -= turn;
+    const xMovement = e.movementX / 2;
+    const yMovement = e.movementY / 2;
+    currentAngle -= xMovement;
+    projectionPlaneCenter -= yMovement;
 }
 
 document.onkeydown = function(e) {
-    keysPressed[e.keyCode] = true;
+    if (e.keyCode === 16) {
+        playerHeight = 16;
+    } else {
+        keysPressed[e.keyCode] = true;
+    }
 };
 
 document.onkeyup = function(e) {
-    keysPressed[e.keyCode] = false;
+    if (e.keyCode === 16) {
+        playerHeight = 32;
+    } else {
+        keysPressed[e.keyCode] = false;
+    }
 };
 
 window.onload = function() {

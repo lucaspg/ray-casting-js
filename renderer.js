@@ -43,27 +43,27 @@ export default class Renderer {
         }
     }
 
-    drawWall (column, wallHeight, dist, wallType, offset, relativeAngle, playerX, playerY, startingAngle) {
+    drawWall (column, wallHeight, dist, wallType, offset, relativeAngle, playerX, playerY, startingAngle, projectionPlaneCenter, playerHeight) {
         if (wallType === 1) {
             this.context.beginPath();
             this.context.fillStyle = shadeColor('#FFFFFF', dist / 448 * -100); 
-            this.context.fillRect(column, (this.canvas.height / 2) - wallHeight / 2, 1, wallHeight);
+            this.context.fillRect(column, projectionPlaneCenter - wallHeight / 2, 1, wallHeight);
             this.context.fill();
             this.context.closePath();
         } else {
             this.context.beginPath();
             const textureId = this.getTextureIdByWallType(wallType)
             const img = document.getElementById(textureId);
-            this.context.drawImage(img, offset, 0, 1, 64, column, (this.canvas.height / 2) - wallHeight / 2, 1, wallHeight)
+            this.context.drawImage(img, offset, 0, 1, 64, column, projectionPlaneCenter - wallHeight / 2, 1, wallHeight)
             const alpha = (dist / 448) < 0.8 ? (dist/ 448) : 0.8;
             this.context.fillStyle = `rgba(0, 0, 0, ${alpha})`;
-            this.context.fillRect(column, (this.canvas.height / 2) - wallHeight / 2, 1, wallHeight);
+            this.context.fillRect(column, projectionPlaneCenter - wallHeight / 2, 1, wallHeight);
             this.context.closePath();
         }
-        let bottomWallPixel = (this.canvas.height / 2) + (Math.floor(wallHeight / 2));
+        let bottomWallPixel = projectionPlaneCenter + (Math.floor(wallHeight / 2));
         this.context.beginPath();
         for (bottomWallPixel; bottomWallPixel < this.canvas.height; bottomWallPixel++) {
-            const straightDistance = (PLAYER_HEIGHT / (bottomWallPixel - (this.canvas.height / 2))) * distanceToProjectionPlane;
+            const straightDistance = (playerHeight / (bottomWallPixel - projectionPlaneCenter)) * distanceToProjectionPlane;
             const actualDistance = straightDistance / Math.cos(relativeAngle);
             let floorY = Math.floor(actualDistance * Math.sin(startingAngle));
             let floorX = Math.floor(actualDistance * Math.cos(startingAngle));
@@ -73,11 +73,28 @@ export default class Renderer {
             const tileColumn = Math.floor(floorX % 64);
             const floor = document.getElementById("floor");
             this.context.drawImage(floor, tileRow, tileColumn, 1, 1, column, bottomWallPixel, 1, 1)
-            this.context.drawImage(floor, tileRow, tileColumn, 1, 1, column, this.canvas.height - bottomWallPixel, 1, 1)
             const alpha = (actualDistance / 448) < 0.8 ? (actualDistance/ 448) : 0.8;
             this.context.fillStyle = `rgba(0, 0, 0, ${alpha})`;
             this.context.fillRect(column, bottomWallPixel, 1, 1);
-            this.context.fillRect(column, this.canvas.height - bottomWallPixel, 1, 1);
+        }
+        this.context.closePath();
+
+        let topWallPixel = projectionPlaneCenter - (Math.floor(wallHeight / 2));
+        this.context.beginPath();
+        for (topWallPixel; topWallPixel >= 0; topWallPixel--) {
+            const straightDistance = (playerHeight / (projectionPlaneCenter - topWallPixel)) * distanceToProjectionPlane;
+            const actualDistance = straightDistance / Math.cos(relativeAngle);
+            let floorY = Math.floor(actualDistance * Math.sin(startingAngle));
+            let floorX = Math.floor(actualDistance * Math.cos(startingAngle));
+            floorX = playerX + floorX;
+            floorY = playerY - floorY;
+            const tileRow = Math.floor(floorY % 64);
+            const tileColumn = Math.floor(floorX % 64);
+            const floor = document.getElementById("floor");
+            this.context.drawImage(floor, tileRow, tileColumn, 1, 1, column, topWallPixel, 1, 1)
+            const alpha = (actualDistance / 448) < 0.8 ? (actualDistance/ 448) : 0.8;
+            this.context.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+            this.context.fillRect(column, topWallPixel, 1, 1);
         }
         this.context.closePath();
     }
