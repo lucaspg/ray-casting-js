@@ -73,6 +73,11 @@ export default class Renderer {
             const tileColumn = Math.floor(floorX % 64);
             const floor = document.getElementById("floor");
             this.context.drawImage(floor, tileRow, tileColumn, 1, 1, column, bottomWallPixel, 1, 1)
+            this.context.drawImage(floor, tileRow, tileColumn, 1, 1, column, this.canvas.height - bottomWallPixel, 1, 1)
+            const alpha = (actualDistance / 448) < 0.8 ? (actualDistance/ 448) : 0.8;
+            this.context.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+            this.context.fillRect(column, bottomWallPixel, 1, 1);
+            this.context.fillRect(column, this.canvas.height - bottomWallPixel, 1, 1);
         }
         this.context.closePath();
     }
